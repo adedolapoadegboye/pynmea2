@@ -21,16 +21,16 @@ def load_source(modname, filename):
 _version = load_source("pynmea2._version", "pynmea2/_version.py")
 
 setup(
-    name='pynmea2',
+    name='pynmea2-quectel',
     version=_version.__version__,
-    author='Tom Flanagan',
-    author_email='tom@zkpq.ca',
+    author='Ade Adegboye',
+    author_email='adedolapo.adegboye@quectel.com',
     license='MIT',
-    url='https://github.com/Knio/pynmea2',
+    url='https://github.com/adedolapoadegboye/pynmea2',
 
-    description='Python library for the NMEA 0183 protcol',
+    description='Python library for standard NMEA 0183 and proprietary quectel GNSS protocol',
     packages=['pynmea2','pynmea2.types','pynmea2.types.proprietary'],
-    keywords='python nmea gps parse parsing nmea0183 0183',
+    keywords='python nmea gps parse parsing nmea0183 0183 quectel gnss proprietary',
 
     classifiers=[
         'Intended Audience :: Developers',
@@ -49,6 +49,7 @@ setup(
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Scientific/Engineering :: GIS',
         'Topic :: Software Development :: Libraries :: Python Modules',
