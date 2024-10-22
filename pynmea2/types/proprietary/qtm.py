@@ -15,8 +15,27 @@ class QTMSAVEPAR(QTM):
 
         Supports:
         - $PQTMSAVEPAR,OK*72
+        - $PQTMSAVEPAR,1*6A (Invalid parameters)
+        - $PQTMSAVEPAR,2*6B (Execution failed)
+        - $PQTMSAVEPAR,3*6C (Command not supported)
     """
     fields = (
         ('Subtype', 'subtype'),
         ('Status', 'status')
     )
+
+    def __init__(self, manufacturer, data):
+        super(QTMSAVEPAR, self).__init__(manufacturer, data)
+        self.status = self.parse_status(data[1])  # Handling the status field
+
+    @staticmethod
+    def parse_status(value):
+        """
+        Parse the status field to return either the OK status or the corresponding error description.
+        """
+        status_map = {
+            "1": "Invalid parameters",
+            "2": "Execution failed",
+            "3": "Command not supported"
+        }
+        return status_map.get(value, value)  # Default to the original value if not in map

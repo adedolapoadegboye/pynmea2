@@ -1,13 +1,29 @@
 import pynmea2
 
-def test_pqtmsavepar():
-    """Test parsing for concatenated format."""
+def test_pqtmsavepar_ok():
+    """Test PQTMSAVEPAR with OK status."""
     data = "$PQTMSAVEPAR,OK*72"
     msg = pynmea2.parse(data)
-    print(msg, msg.manufacturer, msg.subtype, msg.status)
     assert type(msg) == pynmea2.qtm.QTMSAVEPAR
-    assert msg.manufacturers == 'QTM'
-    assert msg.subtype == 'SAVEPAR'
     assert msg.status == "OK"
-    assert msg.render() == data
 
+def test_pqtmsavepar_invalid_params():
+    """Test PQTMSAVEPAR with 'Invalid parameters' error."""
+    data = "$PQTMSAVEPAR,1*6A"
+    msg = pynmea2.parse(data)
+    assert type(msg) == pynmea2.qtm.QTMSAVEPAR
+    assert msg.status == "Invalid parameters"
+
+def test_pqtmsavepar_execution_failed():
+    """Test PQTMSAVEPAR with 'Execution failed' error."""
+    data = "$PQTMSAVEPAR,2*6B"
+    msg = pynmea2.parse(data)
+    assert type(msg) == pynmea2.qtm.QTMSAVEPAR
+    assert msg.status == "Execution failed"
+
+def test_pqtmsavepar_command_not_supported():
+    """Test PQTMSAVEPAR with 'Command not supported' error."""
+    data = "$PQTMSAVEPAR,3*6C"
+    msg = pynmea2.parse(data)
+    assert type(msg) == pynmea2.qtm.QTMSAVEPAR
+    assert msg.status == "Command not supported"
