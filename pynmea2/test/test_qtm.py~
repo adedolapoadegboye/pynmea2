@@ -1,0 +1,13 @@
+import pynmea2
+
+def test_pqtmsavepar():
+    """Test parsing for concatenated format."""
+    data = "$PQTMSAVEPAR,OK*72"
+    msg = pynmea2.parse(data)
+    print(msg, msg.manufacturer, msg.subtype, msg.status)
+    assert type(msg) == pynmea2.qtm.QTMSAVEPAR
+    assert msg.manufacturers == 'QTM'
+    assert msg.subtype == 'SAVEPAR'
+    assert msg.status == "OK"
+    assert msg.render() == data
+

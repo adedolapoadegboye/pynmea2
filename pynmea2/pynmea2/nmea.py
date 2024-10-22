@@ -102,11 +102,20 @@ class NMEASentence(NMEASentenceBase):
             raise ParseError('could not parse data', line)
 
         # pylint: disable=bad-whitespace
-        nmea_str        = match.group('nmea_str')
-        data_str        = match.group('data')
-        checksum        = match.group('checksum')
-        sentence_type   = match.group('sentence_type').upper()
-        data            = data_str.split(',')
+        nmea_str = match.group('nmea_str')
+        data_str = match.group('data')
+        checksum = match.group('checksum')
+        sentence_type = match.group('sentence_type').upper()
+        data = data_str.split(',')
+
+        # Extract the manufacturer (always "QTM") and subtype from concatenated type
+        if sentence_type.startswith("PQTM") and len(sentence_type) > 4:
+            manufacturer = "QTM"
+            subtype = sentence_type[4:]  # Extract "SAVEPAR" part
+            data.insert(0, subtype)  # Add subtype to data for class handling
+            full_type = manufacturer + subtype  # Create full type for lookup
+        else:
+            raise ParseError('Unsupported sentence type: %s' % sentence_type, line)
 
         if checksum:
             cs1 = int(checksum, 16)
@@ -140,7 +149,7 @@ class NMEASentence(NMEASentenceBase):
         proprietary_match = NMEASentence.proprietary_re.match(sentence_type)
         if proprietary_match:
             manufacturer = proprietary_match.group('manufacturer')
-            cls = ProprietarySentence.sentence_types.get(manufacturer, ProprietarySentence)
+            cls = ProprietarySentence.sentence_types.get(full_type, ProprietarySentence)
             return cls(manufacturer, data)
 
         raise ParseError(
