@@ -36,3 +36,80 @@ def test_qtmepe():
     assert msg.epe_down == "12.713"
     assert msg.epe_2d == "4.857"
     assert msg.epe_3d == "13.609"
+
+def test_pqtmcfggeofence():
+    """Test PQTMCFGGEOFENCE with a successful response."""
+    data = "$PQTMCFGGEOFENCE,OK,1,1,0,2,30.123,-90.123,5.0,-91.456,31.789,-92.012,32.000,-93.000*41"
+    msg = pynmea2.parse(data)
+    assert type(msg) == pynmea2.qtm.QTMCFGGEOFENCE
+    assert msg.subtype == "CFGGEOFENCE"
+    assert msg.status == "OK"
+    assert msg.index == "1"
+    assert msg.enabled == "1"
+    assert msg.reserved == "0"
+    assert msg.shape == "2"
+    assert msg.lat0 == "30.123"
+    assert msg.lon0 == "-90.123"
+    assert msg.lat1_or_radius == "5.0"
+    assert msg.lon1 == "-91.456"
+    assert msg.lat2 == "31.789"
+    assert msg.lon2 == "-92.012"
+    assert msg.lat3 == "32.000"
+    assert msg.lon3 == "-93.000"
+
+def test_pqtmgeofencestatus():
+    """Test PQTMGEOFENCESTATUS with example data."""
+    data = "$PQTMGEOFENCESTATUS,1,093444.000,2,0,0,1*28"
+    msg = pynmea2.parse(data)
+
+    assert type(msg) == pynmea2.qtm.QTMGEOFENCESTATUS
+    assert msg.subtype == "GEOFENCESTATUS"
+    assert msg.msg_ver == "1"
+    assert msg.time == "093444.000"
+    assert msg.state0 == "Outside geofence"
+    assert msg.state1 == "Unknown"
+    assert msg.state2 == "Unknown"
+    assert msg.state3 == "Inside geofence"
+
+def test_pqtmcfgsvin():
+    """Test PQTMCFGSVIN with a successful response."""
+    data = "$PQTMCFGSVIN,OK,2,300,1.5,6378137.0,0.0,0.0*7A"
+    msg = pynmea2.parse(data)
+
+    assert type(msg) == pynmea2.qtm.QTMCFGSVIN
+    assert msg.subtype == "CFGSVIN"
+    assert msg.status == "OK"
+    assert msg.mode == "2"
+    assert msg.min_dur == "300"
+    assert msg.acc_limit == "1.5"
+    assert msg.ecef_x == "6378137.0"
+    assert msg.ecef_y == "0.0"
+    assert msg.ecef_z == "0.0"
+
+def test_pqtmsvinstatus():
+    """Test PQTMSVINSTATUS with example data."""
+    data = "$PQTMSVINSTATUS,1,2241,1,0,0,538,43200,-2472436.0802,4828833.0026,3343698.4839,9.5*39"
+    msg = pynmea2.parse(data)
+
+    assert type(msg) == pynmea2.qtm.QTMSVINSTATUS
+    assert msg.subtype == "SVINSTATUS"
+    assert msg.msg_ver == "1"
+    assert msg.tow == "2241"
+    assert msg.valid == "In-progress"
+    assert msg.res0 == "0"
+    assert msg.res1 == "0"
+    assert msg.obs == "538"
+    assert msg.cfg_dur == "43200"
+    assert msg.mean_x == "-2472436.0802"
+    assert msg.mean_y == "4828833.0026"
+    assert msg.mean_z == "3343698.4839"
+    assert msg.mean_acc == "9.5"
+
+def test_pqtmgpsstart():
+    """Test PQTMGNSSSTART with OK response."""
+    data = "$PQTMGNSSSTART,OK*79"
+    msg = pynmea2.parse(data)
+    assert type(msg) == pynmea2.qtm.QTMGNSSSTART
+    assert msg.subtype == "GNSSSTART"
+    assert msg.status == "OK"
+
