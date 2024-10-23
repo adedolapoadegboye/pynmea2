@@ -66,6 +66,6 @@ class QTMRESTOREPAR(QTM):
 
     def __init__(self, manufacturer, data):
         super(QTMRESTOREPAR, self).__init__(manufacturer, data)
-        self.status = data[1] # Handling the status field
+        self.status = self.parse_status(data[1])  # Handling the status field
 
 

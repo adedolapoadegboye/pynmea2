@@ -115,7 +115,7 @@ class NMEASentence(NMEASentenceBase):
             data.insert(0, subtype)  # Add subtype to data for class handling
             full_type = manufacturer + subtype  # Create full type for lookup
         else:
-            raise ParseError(f"Unsupported sentence type: {sentence_type}", line)
+            raise ParseError('Unsupported sentence type: %s' % sentence_type, line)
 
         if checksum:
             cs1 = int(checksum, 16)
@@ -184,6 +184,9 @@ class NMEASentence(NMEASentenceBase):
             return object.__setattr__(self, name, value)
 
         i = t.name_to_idx[name]
+        # Dynamically expand the data list if needed
+        if i >= len(self.data):
+            self.data.extend([''] * (i + 1 - len(self.data)))
         self.data[i] = str(value)
 
     def __repr__(self):

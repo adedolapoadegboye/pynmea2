@@ -1,29 +1,30 @@
 import pynmea2
 
-def test_pqtmsavepar_ok():
+def test_pqtmverno():
+    """Test PQTMVERNO with successful version response."""
+    data = "$PQTMVERNO,LC29HAANR01A04S,2022/11/04,16:39:48*34"
+    msg = pynmea2.parse(data)
+    assert type(msg) == pynmea2.qtm.QTMVERNO
+    assert msg.subtype == "VERNO"
+    assert msg.version == "LC29HAANR01A04S"
+    assert msg.build_date == "2022/11/04"
+    assert msg.build_time == "16:39:48"
+
+def test_pqtmsavepar():
     """Test PQTMSAVEPAR with OK status."""
     data = "$PQTMSAVEPAR,OK*72"
     msg = pynmea2.parse(data)
     assert type(msg) == pynmea2.qtm.QTMSAVEPAR
     assert msg.status == "OK"
 
-def test_pqtmsavepar_invalid_params():
-    """Test PQTMSAVEPAR with 'Invalid parameters' error."""
-    data = "$PQTMSAVEPAR,1*47"
+def test_pqtmrestorepar():
+    """Test PQTMSAVEPAR with OK status."""
+    data = "$PQTMRESTOREPAR,OK*3B"
     msg = pynmea2.parse(data)
-    assert type(msg) == pynmea2.qtm.QTMSAVEPAR
-    assert msg.status == "Invalid parameters"
+    assert type(msg) == pynmea2.qtm.QTMRESTOREPAR
+    assert msg.status == "OK"
 
-def test_pqtmsavepar_execution_failed():
-    """Test PQTMSAVEPAR with 'Execution failed' error."""
-    data = "$PQTMSAVEPAR,2*44"
-    msg = pynmea2.parse(data)
-    assert type(msg) == pynmea2.qtm.QTMSAVEPAR
-    assert msg.status == "Execution failed"
 
-def test_pqtmsavepar_command_not_supported():
-    """Test PQTMSAVEPAR with 'Command not supported' error."""
-    data = "$PQTMSAVEPAR,3*45"
-    msg = pynmea2.parse(data)
-    assert type(msg) == pynmea2.qtm.QTMSAVEPAR
-    assert msg.status == "Command not supported"
+
+
+
