@@ -18,13 +18,21 @@ def test_pqtmsavepar():
     assert msg.status == "OK"
 
 def test_pqtmrestorepar():
-    """Test PQTMSAVEPAR with OK status."""
-    data = "$$PQTMRESTOREPAR,OK*3B"
+    """Test PQTMRESTOREPAR with OK status."""
+    data = "$PQTMRESTOREPAR,OK*3B"
     msg = pynmea2.parse(data)
     assert type(msg) == pynmea2.qtm.QTMRESTOREPAR
     assert msg.status == "OK"
 
-
-
-
-
+def test_qtmepe():
+    """Test QTMEPE with example data."""
+    data = "$PQTMEPE,2,3.393,3.476,12.713,4.857,13.609*5D"
+    msg = pynmea2.parse(data)
+    assert type(msg) == pynmea2.qtm.QTMEPE
+    assert msg.subtype == "EPE"
+    assert msg.msg_ver == 2
+    assert msg.epe_north == 3.393
+    assert msg.epe_east == 3.476
+    assert msg.epe_down == 12.713
+    assert msg.epe_2d == 4.857
+    assert msg.epe_3d == 13.609

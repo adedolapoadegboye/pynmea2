@@ -65,35 +65,4 @@ class QTMRESTOREPAR(QTM):
         super(QTMRESTOREPAR, self).__init__(manufacturer, data)
         self.status = data[1]  # Handle status field
 
-class QTMEPE(QTM):
-    """
-    PQTMEPE Message
 
-    Outputs the estimated positioning error.
-
-    Supports:
-    - $PQTMEPE,<MsgVer>,<EPE_North>,<EPE_East>,<EPE_Down>,<EPE_2D>,<EPE_3D>*<Checksum>
-    """
-
-    fields = (
-        ('subtype', 'subtype'),  # EPE
-        ('msg_ver', 'msg_ver'),  # Message version (always 2)
-        ('epe_north', 'epe_north'),  # Estimated north error (in meters)
-        ('epe_east', 'epe_east'),  # Estimated east error (in meters)
-        ('epe_down', 'epe_down'),  # Estimated down error (in meters)
-        ('epe_2d', 'epe_2d'),  # Estimated 2D position error (in meters)
-        ('epe_3d', 'epe_3d'),  # Estimated 3D position error (in meters)
-    )
-
-    def __init__(self, manufacturer, data):
-        super(QTMEPE, self).__init__(manufacturer, data)
-        print(data)  # Debugging print to confirm input structure
-
-        # Set attributes based on input data
-        self.subtype = data[0]
-        self.msg_ver = int(data[1])
-        self.epe_north = float(data[2])
-        self.epe_east = float(data[3])
-        self.epe_down = float(data[4])
-        self.epe_2d = float(data[5])
-        self.epe_3d = float(data[6])
