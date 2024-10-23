@@ -175,6 +175,6 @@ def test_pqtmcfgrcvrmode():
 
     # Check if the mode description matches
     description = msg.get_mode_description()
-    assert description == "Base Station"
+    assert description == "Base Station (Disables NMEA, enables RTCM MSM4, MSM7, 1005)"
 
 

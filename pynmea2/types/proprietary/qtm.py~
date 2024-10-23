@@ -466,7 +466,7 @@ class QTMCFGRCVRMODE(QTM):
     Receiver Working Modes:
     - "0" = Unknown
     - "1" = Rover (Restores to default NMEA output)
-    - "2" = Base Station (Disables NMEA output, enables RTCM MSM4 1005 messages)
+    - "2" = Base Station (Disables NMEA output, enables RTCM MSM4, MSM7, 1005 messages)
     """
 
     fields = (
