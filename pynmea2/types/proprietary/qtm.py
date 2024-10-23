@@ -16,18 +16,18 @@ class QTMVERNO(QTM):
     Supports:
     - $PQTMVERNO,<VerStr>,<BuildDate>,<BuildTime>*<Checksum>
     """
-
     fields = (
-        ('Subtype', 'subtype'), # VERNO
-        ('Version', 'version'), # LC29HAANR01A04S for example
-        ('BuildDate', 'build_date'), # Format: YYYY/MM/DD for example
-        ('BuildTime', 'build_time'), # Format: HH:MM:SS for example
+        ('subtype', 'subtype'),  # VERNO
+        ('version', 'version'),  # LC29HAANR01A04S for example
+        ('build_date', 'build_date'),  # Format: YYYY/MM/DD
+        ('build_time', 'build_time'),  # Format: HH:MM:SS
     )
 
     def __init__(self, manufacturer, data):
         super(QTMVERNO, self).__init__(manufacturer, data)
         print(data)  # Debugging print to confirm input structure
-         # Handle success case
+
+        # Set attributes based on successful data
         self.subtype = data[0]
         self.version = data[1]
         self.build_date = data[2]
@@ -35,37 +35,32 @@ class QTMVERNO(QTM):
 
 class QTMSAVEPAR(QTM):
     """
-        PQTM SAVEPAR Message
+    PQTM SAVEPAR Message
 
-        Supports:
-        - $PQTMSAVEPAR,OK*72
-
+    Supports:
+    - $PQTMSAVEPAR,OK*72
     """
     fields = (
-        ('Subtype', 'subtype'),
-        ('Status', 'status')
+        ('subtype', 'subtype'),
+        ('status', 'status')
     )
 
     def __init__(self, manufacturer, data):
         super(QTMSAVEPAR, self).__init__(manufacturer, data)
-        self.status = data[1]  # Handling the status field
-
+        self.status = data[1]  # Handle status field
 
 class QTMRESTOREPAR(QTM):
     """
-        PQTM SAVEPAR Message
+    PQTM RESTOREPAR Message
 
-        Supports:
-        - $PQTMRESTOREPAR,OK*3B
-
+    Supports:
+    - $PQTMRESTOREPAR,OK*3B
     """
     fields = (
-        ('Subtype', 'subtype'),
-        ('Status', 'status')
+        ('subtype', 'subtype'),
+        ('status', 'status')
     )
 
     def __init__(self, manufacturer, data):
         super(QTMRESTOREPAR, self).__init__(manufacturer, data)
-        self.status = data[1] # Handling the status field
-
-
+        self.status = data[1]  # Handle status field
