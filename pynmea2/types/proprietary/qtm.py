@@ -496,3 +496,379 @@ class QTMCFGRCVRMODE(QTM):
         # Return description based on the mode value
         return mode_map.get(self.mode, "Invalid mode")
 
+class QTMPL(QTM):
+    """
+    PQTMPL Message
+
+    Outputs the protection levels (PL) and uncertainty metrics.
+
+    Supports:
+    - $PQTMPL,<MsgVer>,<TOW>,<PUL>,<Res1>,<Res2>,<PL_PosN>,<PL_PosE>,<PL_PosD>,
+      <PL_VelN>,<PL_VelE>,<PL_VelD>,<Res3>,<Res4>,<PL_Time>*<Checksum><CR><LF>
+
+    Field Descriptions:
+    - <MsgVer>: Message version (Always 1).
+    - <TOW>: Time of week (Milliseconds).
+    - <PUL>: Probability of uncertainty level per epoch (%).
+    - <PL_PosN>, <PL_PosE>, <PL_PosD>: Protection levels for North, East, Down (mm).
+    - <PL_VelN>, <PL_VelE>, <PL_VelD>: Protection levels for velocities (mm/s).
+    - <PL_Time>: Protection level of time (ns).
+    - Reserved fields are always null.
+    """
+
+    fields = (
+        ('subtype', 'subtype'),  # Always "PL"
+        ('msg_ver', 'msg_ver'),  # Message version (Always 1)
+        ('tow', 'tow'),  # Time of week in milliseconds
+        ('pul', 'pul'),  # Probability of uncertainty level (%)
+        ('res1', 'res1'),  # Reserved (Always 1)
+        ('res2', 'res2'),  # Reserved (Always 1)
+        ('pl_posn', 'pl_posn'),  # Protection level (North) in mm
+        ('pl_pose', 'pl_pose'),  # Protection level (East) in mm
+        ('pl_posd', 'pl_posd'),  # Protection level (Down) in mm
+        ('pl_veln', 'pl_veln'),  # Protection level of north velocity (mm/s)
+        ('pl_vele', 'pl_vele'),  # Protection level of east velocity (mm/s)
+        ('pl_veld', 'pl_veld'),  # Protection level of down velocity (mm/s)
+        ('res3', 'res3'),  # Reserved (Always null)
+        ('res4', 'res4'),  # Reserved (Always null)
+        ('pl_time', 'pl_time')  # Protection level of time (ns)
+    )
+
+    def __init__(self, manufacturer, data):
+        super(QTMPL, self).__init__(manufacturer, data)
+        print(data)  # Debugging print to confirm input structure
+
+        # Assign parsed fields to the instance
+        self.subtype = data[0]
+        self.msg_ver = data[1]
+        self.tow = data[2]
+        self.pul = data[3]
+        self.res1 = data[4]
+        self.res2 = data[5]
+        self.pl_posn = data[6]
+        self.pl_pose = data[7]
+        self.pl_posd = data[8]
+        self.pl_veln = data[9]
+        self.pl_vele = data[10]
+        self.pl_veld = data[11]
+        self.res3 = data[12] if len(data) > 12 else None  # Optional reserved field
+        self.res4 = data[13] if len(data) > 13 else None  # Optional reserved field
+        self.pl_time = data[14] if len(data) > 14 else None  # Optional time protection level
+
+class QTMCFGSBAS(QTM):
+    """
+    PQTMCFGSBAS Message
+
+    Supports:
+    - $PQTMCFGSBAS,OK,<Value>*<Checksum><CR><LF>
+
+    SBAS Configuration:
+    - Bit 0 = WAAS
+    - Bit 2 = EGNOS
+    - Bit 4 = MSAS
+    - Bit 5 = GAGAN
+    """
+
+    fields = (
+        ('subtype', 'subtype'),  # Always "CFGSBAS"
+        ('status', 'status'),  # "OK"
+        ('value', 'value'),  # SBAS configuration value (Hexadecimal)
+    )
+
+    def __init__(self, manufacturer, data):
+        super(QTMCFGSBAS, self).__init__(manufacturer, data)
+        print(data)  # Debugging print to confirm input structure
+
+        # Assign fields for the successful set response
+        self.subtype = data[0]  # Should always be "CFGSBAS"
+        self.status = data[1]  # Should be "OK"
+        self.value = data[2]  # Hexadecimal value representing SBAS configuration
+
+    def get_sbas_description(self):
+        """
+        Get the SBAS configuration description based on the hexadecimal value.
+        """
+        sbas_map = {
+            0: "WAAS",
+            2: "EGNOS",
+            4: "MSAS",
+            5: "GAGAN"
+        }
+        # Convert the hex value to integer and find the bit-enabled services
+        services = [sbas_map[bit] for bit in sbas_map if int(self.value, 16) & (1 << bit)]
+        return services if services else ["No SBAS Service Enabled"]
+
+class QTMCFGCNST(QTM):
+    """
+    PQTMCFGCNST Message
+
+    Supports:
+    - $PQTMCFGCNST,OK,<GPS>,<GLONASS>,<Galileo>,<BDS>,<QZSS>,<Reserved>*<Checksum><CR><LF>
+
+    Constellation Configuration:
+    - <GPS>: 0 = Disable, 1 = Enable
+    - <GLONASS>: 0 = Disable, 1 = Enable
+    - <Galileo>: 0 = Disable, 1 = Enable
+    - <BDS>: 0 = Disable, 1 = Enable
+    - <QZSS>: 0 = Disable, 1 = Enable
+    - <Reserved>: Always 0
+    """
+
+    fields = (
+        ('subtype', 'subtype'),  # Always "CFGCNST"
+        ('status', 'status'),  # "OK"
+        ('gps', 'gps'),  # GPS Enabled/Disabled
+        ('glonass', 'glonass'),  # GLONASS Enabled/Disabled
+        ('galileo', 'galileo'),  # Galileo Enabled/Disabled
+        ('bds', 'bds'),  # BDS Enabled/Disabled
+        ('qzss', 'qzss'),  # QZSS Enabled/Disabled
+        ('reserved', 'reserved')  # Always 0
+    )
+
+    def __init__(self, manufacturer, data):
+        super(QTMCFGCNST, self).__init__(manufacturer, data)
+        print(data)  # Debugging print to confirm input structure
+
+        # Assign fields for the successful set response
+        self.subtype = data[0]  # Should always be "CFGCNST"
+        self.status = data[1]  # Should be "OK"
+        self.gps = data[2]
+        self.glonass = data[3]
+        self.galileo = data[4]
+        self.bds = data[5]
+        self.qzss = data[6]
+        self.reserved = data[7]
+
+    def get_constellation_status(self):
+        """
+        Get the status of all constellations based on the response.
+        """
+        status_map = {
+            '0': "Disabled",
+            '1': "Enabled"
+        }
+        return {
+            "GPS": status_map.get(self.gps, "Invalid"),
+            "GLONASS": status_map.get(self.glonass, "Invalid"),
+            "Galileo": status_map.get(self.galileo, "Invalid"),
+            "BDS": status_map.get(self.bds, "Invalid"),
+            "QZSS": status_map.get(self.qzss, "Invalid")
+        }
+
+class QTMDOP(QTM):
+    """
+    PQTMDOP Message
+
+    Supports:
+    - $PQTMDOP,<MsgVer>,<TOW>,<GDOP>,<PDOP>,<TDOP>,<VDOP>,<HDOP>,<NDOP>,<EDOP>*<Checksum><CR><LF>
+
+    DOP Values:
+    - GDOP: Geometric Dilution of Precision
+    - PDOP: Position Dilution of Precision (3D)
+    - TDOP: Time Dilution of Precision
+    - VDOP: Vertical Dilution of Precision
+    - HDOP: Horizontal Dilution of Precision
+    - NDOP: Northing Dilution of Precision
+    - EDOP: Easting Dilution of Precision
+
+    Note: If the value is invalid, it will be 99.99
+    """
+
+    fields = (
+        ('subtype', 'subtype'),  # Always "DOP"
+        ('msg_ver', 'msg_ver'),  # Message version (Always 1)
+        ('tow', 'tow'),  # Time of week (ms)
+        ('gdop', 'gdop'),  # Geometric DOP
+        ('pdop', 'pdop'),  # Position DOP
+        ('tdop', 'tdop'),  # Time DOP
+        ('vdop', 'vdop'),  # Vertical DOP
+        ('hdop', 'hdop'),  # Horizontal DOP
+        ('ndop', 'ndop'),  # Northing DOP
+        ('edop', 'edop'),  # Easting DOP
+    )
+
+    def __init__(self, manufacturer, data):
+        super(QTMDOP, self).__init__(manufacturer, data)
+        print(data)  # Debugging print to confirm input structure
+
+        # Assign fields from the data
+        self.subtype = data[0]  # Always "DOP"
+        self.msg_ver = data[1]  # Always 1
+        self.tow = data[2]  # Time of week in milliseconds
+        self.gdop = data[3]
+        self.pdop = data[4]
+        self.tdop = data[5]
+        self.vdop = data[6]
+        self.hdop = data[7]
+        self.ndop = data[8]
+        self.edop = data[9]
+
+    def get_dop_status(self, dop_value):
+        """
+        Interpret the DOP value and return 'Valid' or 'Invalid'.
+        """
+        return "Valid" if float(dop_value) < 99.99 else "Invalid"
+
+class QTMCFGFIXRATE(QTM):
+    """
+    PQTMCFGFIXRATE Message
+
+    Supports:
+    - $PQTMCFGFIXRATE,OK*<Checksum><CR><LF> (Successful Set Response)
+
+    Attributes:
+    - subtype: CFGFIXRATE (always)
+    - status: OK (indicates a successful set)
+    """
+
+    fields = (
+        ('subtype', 'subtype'),  # Always "CFGFIXRATE"
+        ('status', 'status')     # Always "OK"
+    )
+
+    def __init__(self, manufacturer, data):
+        super(QTMCFGFIXRATE, self).__init__(manufacturer, data)
+        print(data)  # Debugging print to confirm input structure
+
+        # Assign the parsed data to attributes
+        self.subtype = data[0]  # "CFGFIXRATE"
+        self.status = data[1]   # "OK"
+
+class QTMVEL(QTM):
+    """
+    PQTMVEL Message
+
+    Outputs the velocity information.
+
+    Supports:
+    - $PQTMVEL,<Time>,<VelN>,<VelE>,<VelD>,<GrdSpd>,<Spd>,<Heading>,<GrdSpdAcc>,<SpdAcc>,<HeadingAcc>*<Checksum><CR><LF>
+
+    Attributes:
+    - time: UTC time (hhmmss.sss)
+    - vel_n: North velocity in m/s
+    - vel_e: East velocity in m/s
+    - vel_d: Down velocity in m/s
+    - grd_spd: 2D speed in m/s
+    - spd: 3D speed in m/s
+    - heading: Heading in degrees (0.00 - 360.00)
+    - grd_spd_acc: Estimate of 2D speed accuracy in m/s
+    - spd_acc: Estimate of 3D speed accuracy in m/s
+    - heading_acc: Estimate of heading accuracy in degrees
+    """
+
+    fields = (
+        ('subtype', 'subtype'),  # Always "VEL"
+        ('msg_ver', 'msg_ver'),  # Message version (Always 1)
+        ('time', 'time'),  # UTC time (hhmmss.sss)
+        ('vel_n', 'vel_n'),  # North velocity (m/s)
+        ('vel_e', 'vel_e'),  # East velocity (m/s)
+        ('vel_d', 'vel_d'),  # Down velocity (m/s)
+        ('grd_spd', 'grd_spd'),  # 2D speed (m/s)
+        ('spd', 'spd'),  # 3D speed (m/s)
+        ('heading', 'heading'),  # Heading (degrees)
+        ('grd_spd_acc', 'grd_spd_acc'),  # 2D speed accuracy (m/s)
+        ('spd_acc', 'spd_acc'),  # 3D speed accuracy (m/s)
+        ('heading_acc', 'heading_acc')  # Heading accuracy (degrees)
+    )
+
+    def __init__(self, manufacturer, data):
+        super(QTMVEL, self).__init__(manufacturer, data)
+        print(data)  # Debugging print to confirm input structure
+
+        # Assign parsed values to attributes
+        self.subtype = data[0]
+        self.version = data[1]
+        self.time = data[2]
+        self.vel_n = float(data[3])
+        self.vel_e = float(data[4])
+        self.vel_d = float(data[5])
+        self.grd_spd = float(data[6])
+        self.spd = float(data[7])
+        self.heading = float(data[8])
+        self.grd_spd_acc = float(data[9])
+        self.spd_acc = float(data[10])
+        self.heading_acc = float(data[11])
+
+class QTMCFGODO(QTM):
+    """
+    PQTMCFGODO Message
+
+    Supports:
+    - $PQTMCFGODO,OK,<State>,<InitDist>*<Checksum><CR><LF>
+
+    Odometer Feature Configuration:
+    - State: 0 = Disabled, 1 = Enabled
+    - InitDist: Initial distance (meters), default value is 0.
+    """
+
+    fields = (
+        ('subtype', 'subtype'),  # Always "CFGODO"
+        ('status', 'status'),  # "OK"
+        ('state', 'state'),  # 0 = Disabled, 1 = Enabled
+        ('init_dist', 'init_dist')  # Initial distance in meters
+    )
+
+    def __init__(self, manufacturer, data):
+        super(QTMCFGODO, self).__init__(manufacturer, data)
+        print(data)  # Debugging print to confirm input structure
+
+        # Assign fields for the successful set response
+        self.subtype = data[0]  # Should always be "CFGODO"
+        self.status = data[1]  # Should be "OK"
+        self.state = data[2]  # Odometer state: 0 = Disabled, 1 = Enabled
+        self.init_dist = data[3]  # Initial distance in meters
+
+    def get_state_description(self):
+        """
+        Get the description of the odometer state.
+        """
+        state_map = {
+            "0": "Disabled",
+            "1": "Enabled"
+        }
+        return state_map.get(self.state, "Unknown state")
+
+class QTMODO(QTM):
+    """
+    PQTMODO Message
+
+    Outputs the odometer information.
+
+    Supports:
+    - $PQTMMODO,<MsgVer>,<Time>,<State>,<Dist>*<Checksum><CR><LF>
+
+    Fields:
+    - MsgVer: Message version (Always 1).
+    - Time: UTC time (hhmmss.sss).
+    - State: Odometer status (0 = Disabled, 1 = Enabled).
+    - Dist: Distance since last reset (meters).
+    """
+
+    fields = (
+        ('subtype', 'subtype'),  # Always "MODO"
+        ('msg_ver', 'msg_ver'),  # Message version (1)
+        ('time', 'time'),  # UTC time (hhmmss.sss)
+        ('state', 'state'),  # Odometer state: 0 = Disabled, 1 = Enabled
+        ('dist', 'dist')  # Distance since last reset (meters)
+    )
+
+    def __init__(self, manufacturer, data):
+        super(QTMODO, self).__init__(manufacturer, data)
+        print(data)  # Debugging print to confirm input structure
+
+        # Assign the parsed fields
+        self.subtype = data[0]  # Should always be "MODO"
+        self.msg_ver = data[1]  # Always 1
+        self.time = data[2]  # UTC time in hhmmss.sss format
+        self.state = data[3]  # Odometer state
+        self.dist = data[4]  # Distance since last reset in meters
+
+    def get_state_description(self):
+        """
+        Get the description of the odometer state.
+        """
+        state_map = {
+            "0": "Disabled",
+            "1": "Enabled"
+        }
+        return state_map.get(self.state, "Unknown state")
