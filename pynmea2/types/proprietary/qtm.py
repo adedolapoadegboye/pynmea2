@@ -1,4 +1,6 @@
+from decimal import Decimal
 from ... import nmea
+from ...nmea_utils import *
 
 class QTM(nmea.ProprietarySentence):
     sentence_types = {}
@@ -18,20 +20,25 @@ class QTMVERNO(QTM):
     """
     fields = (
         ('subtype', 'subtype'),  # VERNO
-        ('version', 'version'),  # LC29HAANR01A04S for example
+        ('version', 'version'),  # Example: LC29HAANR01A04S
         ('build_date', 'build_date'),  # Format: YYYY/MM/DD
         ('build_time', 'build_time'),  # Format: HH:MM:SS
     )
 
     def __init__(self, manufacturer, data):
         super(QTMVERNO, self).__init__(manufacturer, data)
-        print(data)  # Debugging print to confirm input structure
+        # print(data)  # Debugging print to confirm input structure
 
-        # Set attributes based on successful data
+        # Assign attributes using the shared utils for formatting
         self.subtype = data[0]
         self.version = data[1]
-        self.build_date = data[2]
-        self.build_time = data[3]
+        self.date = parse_iso_date(data[2])  # Use the new date parser
+        self.build_time = parse_iso_time(data[3])  # Use the shared timestamp function
+
+    def __repr__(self):
+        # Improved __repr__ for better readability
+        return (f"<QTMVERNO(subtype={self.subtype}, version='{self.version}', "
+                f"build_date={self.build_date}, build_time={self.build_time})>")
 
 class QTMSAVEPAR(QTM):
     """
@@ -87,7 +94,7 @@ class QTMEPE(QTM):
 
     def __init__(self, manufacturer, data):
         super(QTMEPE, self).__init__(manufacturer, data)
-        print(data)  # Debugging print to confirm input structure
+        # print(data)  # Debugging print to confirm input structure
 
         # Set attributes based on input data
         self.subtype = data[0]
@@ -126,7 +133,7 @@ class QTMCFGGEOFENCE(QTM):
 
     def __init__(self, manufacturer, data):
         super(QTMCFGGEOFENCE, self).__init__(manufacturer, data)
-        print(data)  # Debugging print to confirm input structure
+        # print(data)  # Debugging print to confirm input structure
 
         # Extract and assign the mandatory fields
         self.subtype = data[0]  # Should always be "CFGGEOGENCE"
@@ -176,7 +183,7 @@ class QTMGEOFENCESTATUS(QTM):
 
     def __init__(self, manufacturer, data):
         super(QTMGEOFENCESTATUS, self).__init__(manufacturer, data)
-        print(data)  # Debugging print to confirm input structure
+        # print(data)  # Debugging print to confirm input structure
 
         # Assign the parsed fields
         self.subtype = data[0]  # Should always be "GEOFENCESTATUS"
@@ -230,7 +237,7 @@ class QTMCFGSVIN(QTM):
 
     def __init__(self, manufacturer, data):
         super(QTMCFGSVIN, self).__init__(manufacturer, data)
-        print(data)  # Debugging print to confirm input structure
+        # print(data)  # Debugging print to confirm input structure
 
         # Set attributes based on input data
         self.subtype = data[0]  # Always "CFGSVIN"
@@ -281,7 +288,7 @@ class QTMSVINSTATUS(QTM):
 
     def __init__(self, manufacturer, data):
         super(QTMSVINSTATUS, self).__init__(manufacturer, data)
-        print(data)  # Debugging print to confirm input structure
+        # print(data)  # Debugging print to confirm input structure
 
         # Assign the parsed fields to class attributes
         self.subtype = data[0]
@@ -329,7 +336,7 @@ class QTMGNSSSTART(QTM):
 
     def __init__(self, manufacturer, data):
         super(QTMGNSSSTART, self).__init__(manufacturer, data)
-        print(data)  # Debugging print to confirm input structure
+        # print(data)  # Debugging print to confirm input structure
 
         # Extract subtype and status
         self.subtype = data[0]
@@ -355,7 +362,7 @@ class QTMGNSSSTOP(QTM):
 
     def __init__(self, manufacturer, data):
         super(QTMGNSSSTOP, self).__init__(manufacturer, data)
-        print(data)  # Debugging print to confirm input structure
+        # print(data)  # Debugging print to confirm input structure
 
         # Extract subtype and status
         self.subtype = data[0]
@@ -398,7 +405,7 @@ class QTMPVT(QTM):
 
     def __init__(self, manufacturer, data):
         super(QTMPVT, self).__init__(manufacturer, data)
-        print(data)  # Debugging print to confirm input structure
+        # print(data)  # Debugging print to confirm input structure
 
         # Assigning the values from the input data
         self.subtype = data[0]
@@ -444,7 +451,7 @@ class QTMCFGNMEADP(QTM):
 
     def __init__(self, manufacturer, data):
         super(QTMCFGNMEADP, self).__init__(manufacturer, data)
-        print(data)  # Debugging print to confirm input structure
+        # print(data)  # Debugging print to confirm input structure
 
         # Assign the parsed fields from the input data
         self.subtype = data[0]  # Should always be "CFGNMEADP"
@@ -477,7 +484,7 @@ class QTMCFGRCVRMODE(QTM):
 
     def __init__(self, manufacturer, data):
         super(QTMCFGRCVRMODE, self).__init__(manufacturer, data)
-        print(data)  # Debugging print to confirm input structure
+        # print(data)  # Debugging print to confirm input structure
 
         # Assign fields for the successful set response
         self.subtype = data[0]  # Should always be "CFGRCVRMODE"
@@ -536,7 +543,7 @@ class QTMPL(QTM):
 
     def __init__(self, manufacturer, data):
         super(QTMPL, self).__init__(manufacturer, data)
-        print(data)  # Debugging print to confirm input structure
+        # print(data)  # Debugging print to confirm input structure
 
         # Assign parsed fields to the instance
         self.subtype = data[0]
@@ -577,7 +584,7 @@ class QTMCFGSBAS(QTM):
 
     def __init__(self, manufacturer, data):
         super(QTMCFGSBAS, self).__init__(manufacturer, data)
-        print(data)  # Debugging print to confirm input structure
+        # print(data)  # Debugging print to confirm input structure
 
         # Assign fields for the successful set response
         self.subtype = data[0]  # Should always be "CFGSBAS"
@@ -627,7 +634,7 @@ class QTMCFGCNST(QTM):
 
     def __init__(self, manufacturer, data):
         super(QTMCFGCNST, self).__init__(manufacturer, data)
-        print(data)  # Debugging print to confirm input structure
+        # print(data)  # Debugging print to confirm input structure
 
         # Assign fields for the successful set response
         self.subtype = data[0]  # Should always be "CFGCNST"
@@ -689,7 +696,7 @@ class QTMDOP(QTM):
 
     def __init__(self, manufacturer, data):
         super(QTMDOP, self).__init__(manufacturer, data)
-        print(data)  # Debugging print to confirm input structure
+        # print(data)  # Debugging print to confirm input structure
 
         # Assign fields from the data
         self.subtype = data[0]  # Always "DOP"
@@ -728,7 +735,7 @@ class QTMCFGFIXRATE(QTM):
 
     def __init__(self, manufacturer, data):
         super(QTMCFGFIXRATE, self).__init__(manufacturer, data)
-        print(data)  # Debugging print to confirm input structure
+        # print(data)  # Debugging print to confirm input structure
 
         # Assign the parsed data to attributes
         self.subtype = data[0]  # "CFGFIXRATE"
@@ -773,7 +780,7 @@ class QTMVEL(QTM):
 
     def __init__(self, manufacturer, data):
         super(QTMVEL, self).__init__(manufacturer, data)
-        print(data)  # Debugging print to confirm input structure
+        # print(data)  # Debugging print to confirm input structure
 
         # Assign parsed values to attributes
         self.subtype = data[0]
@@ -810,7 +817,7 @@ class QTMCFGODO(QTM):
 
     def __init__(self, manufacturer, data):
         super(QTMCFGODO, self).__init__(manufacturer, data)
-        print(data)  # Debugging print to confirm input structure
+        # print(data)  # Debugging print to confirm input structure
 
         # Assign fields for the successful set response
         self.subtype = data[0]  # Should always be "CFGODO"
@@ -854,7 +861,7 @@ class QTMODO(QTM):
 
     def __init__(self, manufacturer, data):
         super(QTMODO, self).__init__(manufacturer, data)
-        print(data)  # Debugging print to confirm input structure
+        # print(data)  # Debugging print to confirm input structure
 
         # Assign the parsed fields
         self.subtype = data[0]  # Should always be "MODO"

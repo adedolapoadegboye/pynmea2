@@ -2,6 +2,21 @@
 import datetime
 import re
 
+def parse_iso_time(time_str):
+    """Parses time strings in the format HH:MM:SS."""
+    try:
+        return datetime.datetime.strptime(time_str, '%H:%M:%S').time()
+    except ValueError as e:
+        raise ValueError("Invalid time format: {0}".format(time_str))
+
+
+def parse_iso_date(date_str):
+    """Parses ISO-like dates (YYYY/MM/DD) used in proprietary messages."""
+    try:
+        return datetime.datetime.strptime(date_str, '%Y/%m/%d').date()
+    except ValueError as e:
+        raise ValueError("Invalid date format: {0}".format(date_str))
+
 
 # python 2.7 backport
 if not hasattr(datetime, 'timezone'):

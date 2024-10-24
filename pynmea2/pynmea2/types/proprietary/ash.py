@@ -10,9 +10,9 @@ from ...nmea_utils import *
 
 
 class ASH(nmea.ProprietarySentence):
-    '''
+    """
     Generic Ashtech Response Message
-    '''
+    """
     sentence_types = {}
     def __new__(_cls, manufacturer, data):
         '''
