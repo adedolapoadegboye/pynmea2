@@ -301,7 +301,7 @@ def test_pqtmcfgodo():
     assert msg.get_state_description() == "Enabled"
 
 def test_pqtmodo():
-    """Test PQTMODO with example data."""
+    """Test PQTMODO with example data"""
     data = "$PQTMODO,1,120635.000,1,112.3*6E"
     msg = pynmea2.parse(data)
 
